@@ -17,15 +17,13 @@
 
 import express from "express";
 import { pairDevice, getDevices, disconnectDevice } from "../controllers/waController.js";
-import { getQRCode, sendMessage as sendMessageService,restartConnection } from "../service/waService.js";
-
+import { getQRCode, sendMessage as sendMessageService } from "../service/waService.js";
 
 const router = express.Router();
 
 router.get("/devices", getDevices);
 router.post("/pair", pairDevice);
 router.post("/disconnect", disconnectDevice);
-router.get("/restart/devices, restartConnection")
 
 router.get("/qrcode", (req, res) => {
   const qrData = getQRCode();
