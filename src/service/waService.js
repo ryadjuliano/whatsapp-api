@@ -249,14 +249,46 @@ export async function sendBulkMessage(phoneNumbers, message) {
 
 // ✅ Function untuk restart koneksi
 export async function restartConnection() {
-  connectionStatus = 'restarting'
-  qrCodeData = null
-  qrRawData = null
-  if (sock) {
-    sock.end()
+  try {
+    connectionStatus = "restarting";
+    qrCodeData = null;
+    qrRawData = null;
+
+    console.log("🔄 Restarting WhatsApp connection...");
+
+    // Jika sudah ada socket, tutup dulu
+    if (sock) {
+      try {
+        await sock.ws.close();
+      } catch (err) {
+        console.warn("⚠️ Socket force-closed:", err.message);
+      }
+      sock = null;
+    }
+
+    // Start ulang koneksi
+    const newSock = await startSock();
+
+    connectionStatus = "connected";
+
+    return {
+      success: true,
+      message: "WhatsApp berhasil direstart",
+      status: connectionStatus,
+      device: newSock.user || null,
+    };
+
+  } catch (error) {
+    console.error("❌ Restart connection failed:", error);
+
+    return {
+      success: false,
+      message: "Gagal restart koneksi WhatsApp",
+      error: error.message || error,
+    };
   }
-  return await startSock()
 }
+
 
 // ✅ Function untuk mendapatkan socket instance
 export function getSocket() {
